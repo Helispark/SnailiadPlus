@@ -5,11 +5,11 @@ extends Enemy
 
 
 #region Variables
-const WEAPON_SPEED = 90
+const WEAPON_SPEED = 160
 const SHOT_TIMEOUT = 1.5
 const SIN_ACCEL = 700
 const MAX_OFF_SCREEN_TIME = 3.0
-const DONUT:PackedScene = preload("uid://cr8jpfivtdpnw")
+const PEA:PackedScene = preload("uid://ypf8dhvoybdu")
 
 var velocity:Vector2 = Vector2.ZERO
 var theta:float = 0.0
@@ -21,6 +21,7 @@ var facing_left:bool = false
 var taken_off:bool = false
 var off_screen_time:float = 0.0
 var shot_timeout:float = SHOT_TIMEOUT
+var target_altitude:float = 0.0
 
 @export var sfx_chirp:AudioStreamPlayer
 #endregion
@@ -35,6 +36,7 @@ func _ready() -> void:
 	fly_speed += sin(position.x * 2.332 - position.y * 1.9) * 10.0
 	fly_amplitude += sin(position.x * 7.3 + position.y) * 5.0
 	shot_timeout -= sin(position.x * 2.725 - position.y * 2.6) * 0.8
+	target_altitude = origin.y
 	
 	if display_mode:
 		taken_off = true
@@ -53,24 +55,27 @@ func _process(delta: float) -> void:
 	if taken_off:
 		theta += delta
 		position += velocity * delta
-		position.y = origin.y + sin(theta * theta_mult) * fly_amplitude
-		if position.y > origin.y and not going_up:
+		position.y = target_altitude + sin(theta * theta_mult) * fly_amplitude
+		var player_pos = GameCore.instance.player.position
+		if player_pos.y > target_altitude:
+			target_altitude += 25 * delta
+		elif player_pos.y < target_altitude:
+			target_altitude -= 25 * delta
+		if position.y > target_altitude and not going_up:
 			going_up = true
 			_play_anim(true)
-		elif position.y < origin.y and going_up:
+		elif position.y < target_altitude and going_up:
 			going_up = false
 			_play_anim(false)
 		if display_mode:
 			return
 		if vis.is_on_screen():
 			off_screen_time = 0
-			if hard_mode:
-				shot_timeout -= delta
-				if shot_timeout <= 0.0:
-					shot_timeout = SHOT_TIMEOUT
-					var player_pos = GameCore.instance.player.position
-					var target = Vector2(player_pos - position).normalized()
-					_shoot(DONUT, target, WEAPON_SPEED)
+			shot_timeout -= delta
+			if shot_timeout <= 0.0:
+				shot_timeout = SHOT_TIMEOUT
+				var target = Vector2(player_pos - position).normalized()
+				_shoot(PEA, target, WEAPON_SPEED)
 		else:
 			off_screen_time += delta
 			if off_screen_time >= MAX_OFF_SCREEN_TIME:

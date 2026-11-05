@@ -10,11 +10,14 @@ const GRAVITY = 1200
 const FALL_DIR = Vector2.DOWN
 const CORNER_CHECK_EXTENT = 12
 const SEC_PER_TICK = 0.03
+const SPIKE:PackedScene = preload("uid://5a3oteigti1f")
+const SPIKE_SPEED = 140.0
 
 var elapsed:float = 0.0
 var is_falling:bool = false
 var grace_period = 0.4
 var vel = 0
+var spike_timer:float = 0.0
 
 @export var direction:Statics.DirsSurface = Statics.DirsSurface.NONE:
 	set(value):
@@ -70,6 +73,12 @@ func _physics_process(delta: float) -> void:
 	if not ai_active:
 		return
 	
+	spike_timer += delta
+	if damaged_this_tick and spike_timer > 0.2:
+		var target = Vector2(GameCore.instance.player.position - position).normalized()
+		var speed = SPIKE_SPEED
+		_shoot(SPIKE, target, speed)
+		spike_timer = 0.0
 	if is_falling:
 		vel += GRAVITY * delta
 		body.velocity = FALL_DIR * vel

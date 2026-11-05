@@ -5,10 +5,10 @@ extends Enemy
 
 
 #region Variables
-const HOP_TIMEOUTS:Array = [ 2.4, 3.5, 2.2, 1.6, 3.9, 3.5, 2.9, 3.1, 1.8 ]
-const HOP_HEIGHTS:Array = [ 1.0, 1.0, 1.0, 1.2, 2.0, 1.0, 1.2, 1.0, 2.0 ]
+const HOP_TIMEOUTS:Array = [ 1.0, 1.6, 0.5, 1.0, 0.8, 0.5, 0.5, 0.5, 1.6, 0.5, 0.9, 0.5 ]
+const HOP_HEIGHTS:Array = [ 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.3, 1.0, 2.0, 1.0, 2.0 ]
 const GRAVITY:float = 1200.0
-const VEL_X:float = 100.0
+const VEL_X:float = 150.0
 const JUMP_VEL_BASE:float = -240
 const QUIVER_THRESHOLD:float = 0.5
 const QUIVER_RANGE:float = 1.5

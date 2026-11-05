@@ -21,6 +21,10 @@ const BLINK_TIMEOUT_MAX:float = 3.0
 const GRAV_SHOCK_AHEAD_RADIUS:float = 24.0
 const HAND:PackedScene = preload("uid://bjgywgga30eg1")
 const BOOMERANG:PackedScene = preload("uid://bcgwxtcgdpoep")
+const EIGHTWAY_TIMEOUT:float = 2.0
+const PEA:PackedScene = preload("uid://r8d7uoqub2jq")
+const PEA_SPEED:float = 100.0
+const PEA_COUNT:int = 8
 
 var hands:Array[Enemy] = []
 var hand_thetas:Array[float] = []
@@ -37,6 +41,8 @@ var is_firing:bool = false
 var blink_timeout:float = 0.0
 var grav_shock_kill:bool = false
 var grav_shock_dir:Vector2 = Vector2.ZERO
+var eightway_timeout:float = 2.0
+var can_eightway:bool = false
 
 @export var eyes:SnailySprite2D
 @export var hand_group:Node2D
@@ -107,6 +113,7 @@ func _process(delta: float) -> void:
 	
 	shot_timeout -= delta
 	shot_pattern_timeout -= delta
+	eightway_timeout -= delta
 	
 	if display_mode:
 		for i in hands.size():
@@ -129,6 +136,8 @@ func _process(delta: float) -> void:
 	
 	try_shoot()
 	
+	if can_eightway and eightway_timeout < 0.0:
+		eightway()
 	hand_radius = HAND_RADIUS_BASE + (HAND_RADIUS_MOD * sin(sin(lifetime * 5 / 3)))
 	hand_radius = clampf(hand_radius, HAND_RADIUS_MIN, INF) * hand_radius_mult
 	hand_radius_mult = hand_radius_mult * 0.9 + hand_radius_target * 0.1
@@ -195,6 +204,8 @@ func try_shoot() -> void:
 				hand_radius_target = 1.0
 				shot_count = 0
 				is_firing = false
+				can_eightway = true
+				eightway_timeout = EIGHTWAY_TIMEOUT
 				play_phase_anim("idle")
 
 
@@ -202,6 +213,9 @@ func shoot(angle:float) -> void:
 	var direction:Vector2 = Vector2(cos(angle), sin(angle))
 	bullets.append(_shoot(BOOMERANG, direction, WEAPON_SPEED))
 
+func eightway() -> void:
+	bullets.append_array(_shoot_360_cluster(PEA, 0.0, PEA_SPEED, PEA_COUNT))
+	can_eightway = false
 
 func play_phase_anim(anim_name:String = "", set_as_current:bool = true) -> String:
 	if anim_name == "blink":

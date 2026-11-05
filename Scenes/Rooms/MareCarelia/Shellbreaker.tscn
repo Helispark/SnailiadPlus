@@ -159,7 +159,6 @@ collision_enabled = false
 z_index = 300
 
 [node name="Map" type="TileMapLayer" parent="EntityLayer" unique_id=1839701913]
-tile_map_data = PackedByteArray("AAAHABsAAAALAAEAAAAMABsAAAALAAEAAAAWABsAAAALAAEAAAAbABsAAAALAAEAAAAFAAsAAAAMAB4AAAARAAsAAAAMAB4AAAANAAsAAAAMAB4AAAAaAAsAAAAMAB4AAAA=")
 tile_set = ExtResource("2_xiyhc")
 collision_enabled = false
 

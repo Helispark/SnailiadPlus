@@ -16,8 +16,10 @@ const START_TIMEOUT_SLOW = 1.0
 const STOP_TIMEOUT_FAST = 3.0
 const START_TIMEOUT_FAST = 0.2
 const PEA:PackedScene = preload("uid://ypf8dhvoybdu")
-const PEA_SPEED = 80.0
+const PEA_SPEED = 85.0
 const PEA_MOD = 2.3
+const SPIKE:PackedScene = preload("uid://b6yl4pox3txg0")
+const SPIKE_SPEED = 140.0
 
 var elapsed:float = 0.0
 var is_falling:bool = false
@@ -26,6 +28,7 @@ var vel = 0
 var stop_timeout:float
 var start_timeout:float
 var stopped:bool = false
+var spike_timer:float = 0.0
 
 @export var direction:Statics.DirsSurface = Statics.DirsSurface.NONE:
 	set(value):
@@ -85,6 +88,12 @@ func _physics_process(delta: float) -> void:
 	if not ai_active:
 		return
 	
+	spike_timer += delta
+	if damaged_this_tick and spike_timer > 0.2:
+		var target = Vector2(GameCore.instance.player.position - position).normalized()
+		var speed = SPIKE_SPEED
+		_shoot(SPIKE, target, speed)
+		spike_timer = 0.0
 	stop_timeout -= delta
 	start_timeout -= delta
 	var this_stop = STOP_TIMEOUT_FAST if hard_mode else STOP_TIMEOUT_SLOW
@@ -101,7 +110,7 @@ func _physics_process(delta: float) -> void:
 		play_anim()
 		if vis.is_on_screen():
 			var target = Vector2(GameCore.instance.player.position - position).normalized()
-			var speed = PEA_SPEED * (PEA_MOD if hard_mode else 1.0)
+			var speed = PEA_SPEED * PEA_MOD
 			_shoot(PEA, target, speed)
 	
 	if is_falling:

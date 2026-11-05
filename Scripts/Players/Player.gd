@@ -1523,7 +1523,7 @@ func adjust_health(amount:int, ignore_defense:bool = false, allow_parry_heal:boo
 
 	var shielded:bool = false
 	if amount < 0:
-		amount = ceili(amount * damage_multiplier)
+		amount = ceili(amount * damage_multiplier * 2.0)
 		if grav_shock_state == 1:
 			grav_shock_state = 0
 			if grav_shock_charge:
